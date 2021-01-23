@@ -456,7 +456,10 @@ bool lang_shift_process_custom_keycodes(Key key, keyrecord_t* record) {
         lang_shift_current_shift_layer = lang_get_shift_layer_number();
         layer_on(lang_shift_current_shift_layer);
       } else {
-        shift_activate_from_user(false);
+        shift_should_be = false;
+        if (shift_pressed_count == 0) {
+          shift_activate_from_user(false);
+        }
         layer_off(lang_shift_current_shift_layer);
       }
       return false;
