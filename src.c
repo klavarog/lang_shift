@@ -532,7 +532,7 @@ bool lang_shift_process_custom_keycodes(Key key, keyrecord_t* record) {
 bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
   static Lang lang_stack[3] = {};
   static uint8_t modifiers_count = 0;
-  #define PROCESS(NAME, REGISTER, UNREGISTER) \
+  #define PROCESS(NAME, REGISTER, UNREGISTER, ACTIVATE_LANG) \
     case NAME: { \
       if (record->event.pressed) { \
         lang_stack[modifiers_count] = lang_should_be; \
@@ -540,12 +540,16 @@ bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
         if (lang_should_be == 1) { \
           layer_off(2); \
         } \
-        lang_activate_from_user(0); \
+        if (ACTIVATE_LANG) { \
+          lang_activate_from_user(0); \
+        } \
         REGISTER; \
       } else { \
         UNREGISTER; \
         modifiers_count -= 1; \
-        lang_activate_from_user(lang_stack[modifiers_count]); \
+        if (ACTIVATE_LANG) { \
+          lang_activate_from_user(lang_stack[modifiers_count]); \
+        } \
         if (lang_should_be == 1) { \
           layer_on(2); \
         } \
@@ -557,13 +561,21 @@ bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
   #define Un(x) unregister_code(KC_L ## x)
 
   switch (key) {
-    PROCESS(CTRL_0, Rg(CTRL), Un(CTRL));
-    PROCESS(ALT_0,  Rg(ALT),  Un(ALT));
-    PROCESS(WIN_0,  Rg(GUI),  Un(GUI));
-    PROCESS(CTAL_0, { Rg(CTRL);  Rg(ALT);   }, { Un(ALT);   Un(CTRL);  })
-    PROCESS(SHAL_0, { Rg(SHIFT); Rg(ALT);   }, { Un(ALT);   Un(SHIFT); })
-    PROCESS(CTSH_0, { Rg(CTRL);  Rg(SHIFT); }, { Un(SHIFT); Un(CTRL);  })
-    PROCESS(MCAS_0, { Rg(CTRL);  Rg(ALT); Rg(SHIFT); }, { Un(SHIFT); Un(ALT); Un(CTRL); })
+    PROCESS(CTRL_0, Rg(CTRL), Un(CTRL), false);
+    PROCESS(ALT_0,  Rg(ALT),  Un(ALT), false);
+    PROCESS(WIN_0,  Rg(GUI),  Un(GUI), false);
+    PROCESS(CTAL_0, { Rg(CTRL);  Rg(ALT);   }, { Un(ALT);   Un(CTRL);  }, false);
+    PROCESS(SHAL_0, { Rg(SHIFT); Rg(ALT);   }, { Un(ALT);   Un(SHIFT); }, false);
+    PROCESS(CTSH_0, { Rg(CTRL);  Rg(SHIFT); }, { Un(SHIFT); Un(CTRL);  }, false);
+    PROCESS(MCAS_0, { Rg(CTRL);  Rg(ALT); Rg(SHIFT); }, { Un(SHIFT); Un(ALT); Un(CTRL); }, false);
+
+    PROCESS(CTRL_EN, Rg(CTRL), Un(CTRL), true);
+    PROCESS(ALT_EN,  Rg(ALT),  Un(ALT), true);
+    PROCESS(WIN_EN,  Rg(GUI),  Un(GUI), true);
+    PROCESS(CTAL_EN, { Rg(CTRL);  Rg(ALT);   }, { Un(ALT);   Un(CTRL);  }, true);
+    PROCESS(SHAL_EN, { Rg(SHIFT); Rg(ALT);   }, { Un(ALT);   Un(SHIFT); }, true);
+    PROCESS(CTSH_EN, { Rg(CTRL);  Rg(SHIFT); }, { Un(SHIFT); Un(CTRL);  }, true);
+    PROCESS(MCAS_EN, { Rg(CTRL);  Rg(ALT); Rg(SHIFT); }, { Un(SHIFT); Un(ALT); Un(CTRL); }, true);
   }
 
   return true;
