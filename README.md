@@ -26,6 +26,11 @@ LANG_CHANGE_CTRL_SHIFT
 LANG_CHANGE_WIN_SPACE
 ```
 
+То есть в файле `config.h` должна быть строка следующего вида:
+```
+#define LANG_CHANGE_DEFAULT LANG_CHANGE_ALT_SHIFT
+```
+
 Так же этими вариантами можно задавать способ переключения языка во время работы раскладки, модифицируя переменную `lang_current_change`, либо прямо на раскладке используя кейкоды:
 
 ```c
