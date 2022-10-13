@@ -359,6 +359,17 @@ void lang_synchronize(void) {
         register_code(KC_LSHIFT);
       }
     } break;
+    case LANG_CHANGE_SHIFT_CTRL: {
+      register_code(KC_LSHIFT);
+      register_code(KC_LCTRL);
+      unregister_code(KC_LCTL);
+      unregister_code(KC_LSHIFT);
+
+      // Костыль, потому что при зажатом шифте если хочется нажать клавишу, которая переключает язык, то шифт слетает...
+      if (shift_current == 1) {
+        register_code(KC_LSHIFT);
+      }
+    } break;
     case LANG_CHANGE_WIN_SPACE: {
       register_code(KC_LGUI);
       register_code(KC_SPACE);
@@ -492,6 +503,11 @@ bool lang_shift_process_custom_keycodes(Key key, keyrecord_t* record) {
     case LA_CTSH:
       if (down) {
         lang_current_change = LANG_CHANGE_CTRL_SHIFT;
+      }
+      return false;
+    case LA_SHCT:
+      if (down) {
+        lang_current_change = LANG_CHANGE_SHIFT_CTRL;
       }
       return false;
     case LA_WISP:
