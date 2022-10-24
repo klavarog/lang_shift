@@ -23,7 +23,9 @@
 ```
 LANG_CHANGE_CAPS
 LANG_CHANGE_ALT_SHIFT
+LANG_CHANGE_SHIFT_ALT
 LANG_CHANGE_CTRL_SHIFT
+LANG_CHANGE_SHIFT_CTRL
 LANG_CHANGE_WIN_SPACE
 ```
 
@@ -37,7 +39,9 @@ LANG_CHANGE_WIN_SPACE
 ```c
 LA_CAPS, /* Задаёт переключение языка на Caps. */
 LA_ALSH, /* Задаёт переключение языка на Alt + Shift. */
+LA_SHAL, /* Задаёт переключение языка на Shift + Alt. На Win10 это позволяет избежать появления окна переключения языков. */
 LA_CTSH, /* Задаёт переключение языка на Ctrl + Shift. */
+LA_SHCT, /* Задаёт переключение языка на Shift + Ctrl. На Win10 это позволяет избежать появления окна переключения языков. */
 LA_WISP, /* Задаёт переключение языка на Win + Space. */
 ```
 
