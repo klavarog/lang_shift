@@ -403,6 +403,11 @@ void lang_activate_from_user(Lang lang) {
 	lang_activate(lang);
 }
 
+void lang_activate_from_user_without_sync(Lang lang) {
+	lang_should_be = lang;
+	lang_current = lang;
+}
+
 Key lang_process(Key key, bool down) {
   Key after_agnostic = lang_calc_agnostic(key);
   if (after_agnostic != NONE_KEY) {
@@ -574,6 +579,8 @@ bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
         } \
         if (ACTIVATE_LANG) { \
           lang_activate_from_user(0); \
+        } else { \
+          lang_activate_from_user_without_sync(0); \
         } \
         REGISTER; \
       } else { \
@@ -581,6 +588,8 @@ bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
         modifiers_count -= 1; \
         if (ACTIVATE_LANG) { \
           lang_activate_from_user(lang_stack[modifiers_count]); \
+        } else { \
+          lang_activate_from_user_without_sync(lang_stack[modifiers_count]); \
         } \
         if (lang_should_be == 1) { \
           layer_on(2); \
