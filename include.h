@@ -89,6 +89,10 @@ enum lang_shift_keycodes {
 	EN_BSLS, /* \ */
 	EN_PIPE, /* | */
 
+#ifndef LANG_USE_ANSI
+	EN_LT2,  /* < */
+	EN_GT2,  /* > */
+#endif
 	EN_Z,    /* z */
 	EN_S_Z,  /* Z */
 	EN_X,    /* x */
@@ -189,6 +193,10 @@ enum lang_shift_keycodes {
 	RU_BSLS, /* \ */
 	RU_SLSH, /* / */
 
+#ifndef LANG_USE_ANSI
+	RU_SLS2, /* / */
+	RU_PIPE, /* | */
+#endif
 	RU_JA,   /* я */
 	RU_S_JA, /* Я */
 	RU_CH,   /* ч */
@@ -235,9 +243,15 @@ enum lang_shift_keycodes {
 	AG_COLN, /* : */
 	AG_DQUO, /* " */
 	AG_BSLS, /* \ */
+#ifndef LANG_USE_ANSI
+	AG_PIPE, /* | */
+#endif
 	AG_COMM, /* , */
 	AG_DOT,  /* . */
 	AG_SLSH, /* / */
+#ifndef LANG_USE_ANSI
+	AG_S_SL, /* / */ // This keycode uses the slash with shift on Russian layout instead the slash without shift
+#endif
 	AG_QUES, /* ? */
 
 	/* -------------------------------------------------------------------- */
