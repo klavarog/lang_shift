@@ -81,8 +81,15 @@ Key shift_get_key(Key key) {
     case KS_COLN: return KC_SCLN;
     case KS_QUOT: return KC_QUOT;
     case KS_DQUO: return KC_QUOT;
+#ifdef LANG_USE_ANSI
     case KS_BSLS: return KC_BSLS;
     case KS_PIPE: return KC_BSLS;
+#else
+    case KS_BSLS: return KC_NUHS; // ISO keyboards use another backslash code
+    case KS_PIPE: return KC_NUHS; // but there is no difference for OS
+    case KS_LT2:  return KC_NUBS;
+    case KS_GT2:  return KC_NUBS;
+#endif
     case KS_Z:    return KC_Z;
     case KS_S_Z:  return KC_Z;
     case KS_X:    return KC_X;
@@ -278,9 +285,15 @@ Key lang_calc_agnostic(Key key) {
       case AG_COLN: return EN_COLN;
       case AG_DQUO: return EN_DQUO;
       case AG_BSLS: return EN_BSLS;
+#ifndef LANG_USE_ANSI
+      case AG_PIPE: return EN_PIPE;
+#endif
       case AG_COMM: return EN_COMM;
       case AG_DOT:  return EN_DOT;
       case AG_SLSH: return EN_SLSH;
+#ifndef LANG_USE_ANSI
+      case AG_S_SL: return EN_SLSH;
+#endif
       case AG_QUES: return EN_QUES;
       default:      return NONE_KEY;
     }
@@ -309,9 +322,17 @@ Key lang_calc_agnostic(Key key) {
       case AG_COLN: return RU_COLN;
       case AG_DQUO: return RU_DQUO;
       case AG_BSLS: return RU_BSLS;
+#ifndef LANG_USE_ANSI
+      case AG_PIPE: return RU_PIPE;
+#endif
       case AG_COMM: return RU_COMM;
       case AG_DOT:  return RU_DOT;
+#ifdef LANG_USE_ANSI
       case AG_SLSH: return RU_SLSH;
+#else
+      case AG_SLSH: return RU_SLS2;
+      case AG_S_SL: return RU_SLSH;
+#endif
       case AG_QUES: return RU_QUES;
       default:      return NONE_KEY;
     }

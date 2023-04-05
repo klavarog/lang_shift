@@ -75,6 +75,10 @@ KS_DQUO, /* " */
 KS_BSLS, /* \ */
 KS_PIPE, /* | */
 
+#ifndef LANG_USE_ANSI
+KS_LT2,   /* < */
+KS_GT2,   /* > */
+#endif
 KS_Z,    /* z */
 KS_S_Z,  /* Z */
 KS_X,    /* x */
