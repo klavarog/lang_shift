@@ -471,6 +471,7 @@ uint8_t lang_shift_current_shift_layer = 0;
 void lang_shift_press_key(Key key, bool down) {
   keyrecord_t record = {
     .event = {
+      .type = KEY_EVENT,
       .key = {
         .col = 0,
         .row = 0,
