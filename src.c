@@ -615,13 +615,16 @@ bool lang_shift_process_custom_keycodes(Key key, keyrecord_t* record) {
   return true;
 }
 
+#define LANG_MODIFIERS_MAX 4
 bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
-  static Lang lang_stack[3] = {};
+  static Lang lang_stack[LANG_MODIFIERS_MAX] = {};
   static uint8_t modifiers_count = 0;
   #define PROCESS(NAME, REGISTER, UNREGISTER, ACTIVATE_LANG) \
     case NAME: { \
       if (record->event.pressed) { \
-        lang_stack[modifiers_count] = lang_should_be; \
+        if (modifiers_count < LANG_MODIFIERS_MAX) { \
+          lang_stack[modifiers_count] = lang_should_be; \
+        } \
         modifiers_count += 1; \
         if (lang_should_be == 1) { \
           layer_off(2); \
@@ -634,11 +637,14 @@ bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
         REGISTER; \
       } else { \
         UNREGISTER; \
-        modifiers_count -= 1; \
+        if (modifiers_count > 0) { \
+          modifiers_count -= 1; \
+        } \
+        Lang lang_to_restore = modifiers_count < LANG_MODIFIERS_MAX ? lang_stack[modifiers_count] : 0; \
         if (ACTIVATE_LANG) { \
-          lang_activate_from_user(lang_stack[modifiers_count]); \
+          lang_activate_from_user(lang_to_restore); \
         } else { \
-          lang_activate_from_user_without_sync(lang_stack[modifiers_count]); \
+          lang_activate_from_user_without_sync(lang_to_restore); \
         } \
         if (lang_should_be == 1) { \
           layer_on(2); \
