@@ -200,7 +200,7 @@ void shift_user_timer(void) {
 //                          Работа с одиночным шифтом
 // ---------------------------------------------------------------------------
 
-uint8_t shift_once_disable_stage = 2;
+uint8_t shift_once_disable_stage = 0; // 0 = выключен; 2 = "включён" (armed). На старте выключен.
 uint8_t shift_once_layer_off = 0;
 uint8_t shift_once_layer_current = 0;
 uint32_t shift_once_enabled_time = 0;
