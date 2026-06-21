@@ -7,6 +7,11 @@ Shift shift_current = 0;
 uint32_t shift_timer = 0;
 uint8_t shift_pressed_count = 0;
 
+// Сколько зажатых модификаторов (Ctrl+Shift, Shift+Alt, etc.) сейчас держат Shift
+// напрямую. Пока он не ноль, наш таймер и shift_activate не должны снимать Shift,
+// иначе зажатый модификатор-хоткей теряет Shift.
+uint8_t shift_modifier_count = 0;
+
 Key shift_get_key(Key key) {
   switch (key) {
     case KS_GRV:  return KC_GRV;
@@ -128,7 +133,8 @@ void shift_activate(Shift shift) {
 		shift_timer = timer_read();
 		if (shift) {
 			register_code(KC_LSHIFT);
-		} else {
+		} else if (shift_modifier_count == 0) {
+			// Не снимаем Shift, если его держит зажатый модификатор-хоткей.
 			unregister_code(KC_LSHIFT);
 		}
 	}
@@ -138,6 +144,27 @@ void shift_activate(Shift shift) {
 void shift_activate_from_user(Shift shift) {
   shift_should_be = shift;
   shift_activate(shift);
+}
+
+// Эти функции вызываются из модификаторов (Ctrl+Shift, Shift+Alt, etc.), которые
+// держат Shift напрямую. Они держат Shift в стороне от основной машины состояний
+// shift_current, чтобы обычные буквы хоткея его не сбивали, но при этом не давали
+// таймеру автоснятия Shift его отпустить.
+void shift_modifier_register(void) {
+  shift_modifier_count++;
+  register_code(KC_LSHIFT);
+}
+
+void shift_modifier_unregister(void) {
+  if (shift_modifier_count > 0) {
+    shift_modifier_count--;
+  }
+  // Когда последний модификатор отпущен, снимаем Shift, если его не держит сам
+  // lang_shift (зажатый SFT_N или нажатая в данный момент шифтовая клавиша).
+  if (shift_modifier_count == 0 && shift_should_be == 0 && shift_pressed_count == 0) {
+    unregister_code(KC_LSHIFT);
+    shift_current = 0;
+  }
 }
 
 Key shift_process(Key key, bool down) {
@@ -163,7 +190,7 @@ Key shift_process(Key key, bool down) {
 
 void shift_user_timer(void) {
 	// Нужно выключать шифт после прохождения определённого времени, потому что пользователь ожидает как будто шифт на самом деле включён
-	if (shift_pressed_count == 0 && shift_current != shift_should_be && timer_read() - shift_timer >= 100) {
+	if (shift_pressed_count == 0 && shift_modifier_count == 0 && shift_current != shift_should_be && timer_read() - shift_timer >= 100) {
 		shift_activate(shift_should_be);
 		shift_timer = timer_read();
 	}
@@ -622,23 +649,27 @@ bool lang_shift_process_english_modifiers(Key key, keyrecord_t* record) {
 
   #define Rg(x) register_code(KC_L ## x)
   #define Un(x) unregister_code(KC_L ## x)
+  // Shift у модификаторов держим через отдельный счётчик, чтобы автоснятие Shift
+  // не сбивало зажатый Ctrl+Shift / Shift+Alt хоткей.
+  #define RgSh() shift_modifier_register()
+  #define UnSh() shift_modifier_unregister()
 
   switch (key) {
     PROCESS(CTRL_0, Rg(CTRL), Un(CTRL), false);
     PROCESS(ALT_0,  Rg(ALT),  Un(ALT), false);
     PROCESS(WIN_0,  Rg(GUI),  Un(GUI), false);
     PROCESS(CTAL_0, { Rg(CTRL);  Rg(ALT);   }, { Un(ALT);   Un(CTRL);  }, false);
-    PROCESS(SHAL_0, { Rg(SHIFT); Rg(ALT);   }, { Un(ALT);   Un(SHIFT); }, false);
-    PROCESS(CTSH_0, { Rg(CTRL);  Rg(SHIFT); }, { Un(SHIFT); Un(CTRL);  }, false);
-    PROCESS(MCAS_0, { Rg(CTRL);  Rg(ALT); Rg(SHIFT); }, { Un(SHIFT); Un(ALT); Un(CTRL); }, false);
+    PROCESS(SHAL_0, { RgSh(); Rg(ALT);   }, { Un(ALT);   UnSh(); }, false);
+    PROCESS(CTSH_0, { Rg(CTRL);  RgSh(); }, { UnSh(); Un(CTRL);  }, false);
+    PROCESS(MCAS_0, { Rg(CTRL);  Rg(ALT); RgSh(); }, { UnSh(); Un(ALT); Un(CTRL); }, false);
 
     PROCESS(CTRL_EN, Rg(CTRL), Un(CTRL), true);
     PROCESS(ALT_EN,  Rg(ALT),  Un(ALT), true);
     PROCESS(WIN_EN,  Rg(GUI),  Un(GUI), true);
     PROCESS(CTAL_EN, { Rg(CTRL);  Rg(ALT);   }, { Un(ALT);   Un(CTRL);  }, true);
-    PROCESS(SHAL_EN, { Rg(SHIFT); Rg(ALT);   }, { Un(ALT);   Un(SHIFT); }, true);
-    PROCESS(CTSH_EN, { Rg(CTRL);  Rg(SHIFT); }, { Un(SHIFT); Un(CTRL);  }, true);
-    PROCESS(MCAS_EN, { Rg(CTRL);  Rg(ALT); Rg(SHIFT); }, { Un(SHIFT); Un(ALT); Un(CTRL); }, true);
+    PROCESS(SHAL_EN, { RgSh(); Rg(ALT);   }, { Un(ALT);   UnSh(); }, true);
+    PROCESS(CTSH_EN, { Rg(CTRL);  RgSh(); }, { UnSh(); Un(CTRL);  }, true);
+    PROCESS(MCAS_EN, { Rg(CTRL);  Rg(ALT); RgSh(); }, { UnSh(); Un(ALT); Un(CTRL); }, true);
   }
 
   return true;
