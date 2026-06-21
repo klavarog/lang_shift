@@ -357,7 +357,10 @@ Key lang_calc_agnostic(Key key) {
 #ifdef LANG_USE_ANSI
       case AG_SLSH: return RU_SLSH;
 #else
-      case AG_SLSH: return RU_SLS2;
+      // На стандартной ЙЦУКЕН (Windows/Linux) "/" набирается через Shift на
+      // клавише "\|" (RU_SLSH). Клавиша OEM_102/NUBS (RU_SLS2) без шифта там даёт
+      // "\", а не "/", поэтому для AG_SLSH используем именно RU_SLSH.
+      case AG_SLSH: return RU_SLSH;
       case AG_S_SL: return RU_SLSH;
 #endif
       case AG_QUES: return RU_QUES;
