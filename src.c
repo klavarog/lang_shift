@@ -190,7 +190,7 @@ Key shift_process(Key key, bool down) {
 
 void shift_user_timer(void) {
 	// Нужно выключать шифт после прохождения определённого времени, потому что пользователь ожидает как будто шифт на самом деле включён
-	if (shift_pressed_count == 0 && shift_modifier_count == 0 && shift_current != shift_should_be && timer_read() - shift_timer >= 100) {
+	if (shift_pressed_count == 0 && shift_modifier_count == 0 && shift_current != shift_should_be && (uint16_t)(timer_read() - shift_timer) >= 100) {
 		shift_activate(shift_should_be);
 		shift_timer = timer_read();
 	}
@@ -252,7 +252,7 @@ void shift_once_process(Key key, keyrecord_t* record) {
 }
 
 void shift_once_user_timer(void) {
-  if (shift_once_can_disable && shift_once_is_enabled() && timer_read() - shift_once_enabled_time >= 1000) {
+  if (shift_once_can_disable && shift_once_is_enabled() && (uint16_t)(timer_read() - shift_once_enabled_time) >= 1000) {
     shift_once_disable();
   }
 }
@@ -484,7 +484,7 @@ Key lang_process(Key key, bool down) {
 
 void lang_user_timer(void) {
 	// Нужно выключать язык после прохождения определённого времени, потому что пользователь ожидает как будто шифт на самом деле включён
-	if (lang_pressed_count == 0 && lang_current != lang_should_be && timer_read() - lang_timer >= 100) {
+	if (lang_pressed_count == 0 && lang_current != lang_should_be && (uint16_t)(timer_read() - lang_timer) >= 100) {
 		lang_activate(lang_should_be);
 	}
 }
