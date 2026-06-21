@@ -439,6 +439,13 @@ void lang_synchronize(void) {
       unregister_code(KC_LGUI);
     } break;
   }
+
+  // Сочетание уже отправлено хосту (register_code сразу шлёт репорт), поэтому
+  // здесь мы блокируемся, давая ОС успеть переключить раскладку до того, как
+  // вызывающий код отправит следующий символ. См. LANG_SWITCH_DELAY_MS.
+#if LANG_SWITCH_DELAY_MS > 0
+  wait_ms(LANG_SWITCH_DELAY_MS);
+#endif
 }
 
 void lang_activate(Lang lang) {

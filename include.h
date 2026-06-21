@@ -321,8 +321,16 @@ enum LangChange {
   LANG_CHANGE_WIN_SPACE
 };
 
+// Задержка (в мс) после отправки в ОС сочетания смены языка. Нужна потому, что
+// ОС (например, Windows) переключает раскладку не мгновенно, и если сразу за
+// сменой языка отправить символ, он может быть набран в старой раскладке
+// (например "ё" вместо "`"). 0 — выключено.
+#ifndef LANG_SWITCH_DELAY_MS
+  #define LANG_SWITCH_DELAY_MS 0
+#endif
+
 // Переменная, в которой можно менять текущий способ смены языка
-enum LangChange lang_current_change = 
+enum LangChange lang_current_change =
 #ifdef LANG_CHANGE_DEFAULT
   LANG_CHANGE_DEFAULT;
 #else
